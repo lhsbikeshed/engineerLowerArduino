@@ -97,8 +97,9 @@ void loop(){
     if(c == 'P'){
       //read out everything
       for(int i = 0; i < 12; i++){
-
-        swVal[i] = 255;
+        if(i!=9){    //9 is the grappler arming switch, dont probe it
+          swVal[i] = 255;
+        }
       }
       anaVal[0] = 2048;
       anaVal[1] = 2048;
