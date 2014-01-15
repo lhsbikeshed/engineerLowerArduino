@@ -14,7 +14,7 @@ void setup(){
     digitalWrite(22 + i, HIGH);
     swVal[i] = 0;
   } 
-  
+
   for(int i = 0; i < 4; i++){
     int b = analogRead(i);    
     anaVal[i] = b;     
@@ -25,26 +25,26 @@ void setup(){
     delay(10);
     b = b & digitalRead(22 + i);
     swVal[i] = b;
-      
+
   }
 
   int t = swVal[7] << 1 | swVal[5];
   t = t-1;
-   if(t == 2) {
+  if(t == 2) {
     t = 1;
-  } else if (t == 1){
+  } 
+  else if (t == 1){
     t = 2;
   }
   if(distVal != t){
     distVal = t;
   }
 
-  
-  
-  
-}
 
-void loop(){
+
+
+}
+void readSwitches(){
 
   for(int i = 0; i < 4; i++){
     int b = analogRead(i);
@@ -78,9 +78,10 @@ void loop(){
 
   int t = swVal[7] << 1 | swVal[5];
   t = t-1;
-   if(t == 2) {
+  if(t == 2) {
     t = 1;
-  } else if (t == 1){
+  } 
+  else if (t == 1){
     t = 2;
   }
   if(distVal != t){
@@ -90,11 +91,14 @@ void loop(){
     Serial.print(",");
   }
 
+}
+void loop(){
 
+  readSwitches();
   delay(10);
   while(Serial.available()){
     char c = Serial.read();
-    if(c == 'P'){
+    if(c == 'P'){    //console requested a status update for all switches
       //read out everything
       for(int i = 0; i < 12; i++){
         if(i!=9){    //9 is the grappler arming switch, dont probe it
@@ -105,8 +109,11 @@ void loop(){
       anaVal[1] = 2048;
       anaVal[2] = 2048;
       anaVal[3] = 2048;
+      readSwitches();
+      Serial.print("PC,");//probe complete
     } 
 
   }
 }
+
 
