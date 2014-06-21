@@ -1,3 +1,11 @@
+#define PIN_FUEL  9
+#define FUEL_UPDATE_RATE  200
+
+int lastFuelTime = 0;
+float fuelLevel = 255.0f;
+float fuelRate = 0.0f;
+
+boolean warningSent = false;
 
 int anaVal[] = {
   0,0,0,0};
@@ -40,9 +48,7 @@ void setup(){
     distVal = t;
   }
 
-
-
-
+  
 }
 void readSwitches(){
 
@@ -95,6 +101,31 @@ void readSwitches(){
 void loop(){
 
   readSwitches();
+  //update fuel meter
+  if(millis() - lastFuelTime > FUEL_UPDATE_RATE){
+    
+    if(fuelLevel + fuelRate < 50.0f){
+      fuelLevel = 50.0f;
+      if(!warningSent){
+        Serial.print("FE,");
+        warningSent = true;
+      }
+    } else if (fuelLevel + fuelRate > 255.0f){
+      fuelLevel = 255.0f;
+      if(!warningSent){
+        Serial.print("FF,");
+        warningSent = true;
+      }
+    } else {
+      warningSent = false;
+      fuelLevel += fuelRate;
+     // Serial.println(fuelLevel);
+    }
+    
+    lastFuelTime = millis();
+    analogWrite(PIN_FUEL, (int)fuelLevel);
+  }
+
   delay(10);
   while(Serial.available()){
     char c = Serial.read();
@@ -111,7 +142,18 @@ void loop(){
       anaVal[3] = 2048;
       readSwitches();
       Serial.print("PC,");//probe complete
-    } 
+    } else if ( c == 'F' ){
+      char d = Serial.read();
+   //   Serial.println ((int)d);
+      fuelRate = (((int)d - 128) * 4) / 1000.f;
+ //     Serial.println(fuelRate);
+    } else if (c == 'f'){    //query the fuel level
+      Serial.print((int)fuelLevel);
+      Serial.print(",");
+    } else if( c == 'R'){
+      fuelLevel = 255.0f;
+      fuelRate = 0.0f;
+    }
 
   }
 }
