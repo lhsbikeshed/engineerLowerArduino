@@ -143,13 +143,16 @@ void loop(){
       readSwitches();
       Serial.print("PC,");//probe complete
     } else if ( c == 'F' ){
-      char d = Serial.read();
-   //   Serial.println ((int)d);
-      fuelRate = (((int)d - 128) * 4) / 1000.f;
- //     Serial.println(fuelRate);
+      int d = Serial.read();
+     //Serial.println (d, DEC);
+      fuelRate = ((d - 128) * 4) / 1000.f;
+     //Serial.println(fuelRate);
     } else if (c == 'f'){    //query the fuel level
       Serial.print((int)fuelLevel);
       Serial.print(",");
+    } else if (c=='X'){
+      fuelRate = 0;
+      
     } else if( c == 'R'){
       fuelLevel = 255.0f;
       fuelRate = 0.0f;
